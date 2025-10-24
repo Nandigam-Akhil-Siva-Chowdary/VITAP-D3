@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OSD | Geeks Hive</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .home-hero {
+        min-height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+          url("assets/oilspill-drone.jpg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: white;
+        position: relative;
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 5%;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 100;
+        transition: background-color 0.3s ease;
+      }
+
+      nav.scrolled {
+        background-color: rgba(0, 30, 60, 0.95);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #4fc3f7;
+      }
+
+      .logo span {
+        color: #ffeb3b;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+      }
+
+      nav ul li {
+        margin-left: 30px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.3s;
+        position: relative;
+      }
+
+      nav ul li:hover {
+        color: #4fc3f7;
+      }
+
+      nav ul li::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #4fc3f7;
+        transition: width 0.3s;
+      }
+
+      nav ul li:hover::after {
+        width: 100%;
+      }
+
+      .home-content {
+        max-width: 800px;
+        padding: 0 5%;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .home-content h1 {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        line-height: 1.2;
+      }
+
+      .home-content p {
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+        max-width: 600px;
+      }
+
+      .btn {
+        display: inline-block;
+        background: #4fc3f7;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+        margin-right: 15px;
+        margin-top: 10px;
+      }
+
+      .btn:hover {
+        background: #29b6f6;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 2px solid #4fc3f7;
+      }
+
+      .btn-outline:hover {
+        background: #4fc3f7;
+      }
+
+      .features {
+        padding: 100px 5%;
+        background-color: white;
+      }
+
+      .section-title {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .section-title h2 {
+        font-size: 2.5rem;
+        color: #0d47a1;
+        margin-bottom: 15px;
+      }
+
+      .section-title p {
+        color: #666;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .feature-card {
+        background: #f8fdff;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s;
+        text-align: center;
+        border-top: 4px solid #4fc3f7;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px);
+      }
+
+      .feature-icon {
+        font-size: 2.5rem;
+        color: #4fc3f7;
+        margin-bottom: 20px;
+      }
+
+      .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #0d47a1;
+      }
+
+      .feature-card p {
+        color: #666;
+      }
+
+      .how-it-works {
+        padding: 100px 5%;
+        background: linear-gradient(135deg, #0d47a1 0%, #4fc3f7 100%);
+        color: white;
+      }
+
+      .how-it-works .section-title h2 {
+        color: white;
+      }
+
+      .steps {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1000px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .steps::before {
+        content: "";
+        position: absolute;
+        top: 40px;
+        left: 10%;
+        width: 80%;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .step {
+        text-align: center;
+        width: 30%;
+        position: relative;
+        z-index: 1;
+      }
+
+      .step-number {
+        width: 80px;
+        height: 80px;
+        background: white;
+        color: #0d47a1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0 auto 20px;
+      }
+
+      .step h3 {
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+      }
+
+      .cta-section {
+        padding: 100px 5%;
+        text-align: center;
+        background-color: #f5f7fa;
+      }
+
+      .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: #0d47a1;
+      }
+
+      .cta-section p {
+        max-width: 600px;
+        margin: 0 auto 30px;
+        color: #666;
+      }
+
+      footer {
+        background: #0d1b2a;
+        color: white;
+        padding: 60px 5% 30px;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .footer-column h3 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        color: #4fc3f7;
+      }
+
+      .footer-column ul {
+        list-style: none;
+      }
+
+      .footer-column ul li {
+        margin-bottom: 10px;
+      }
+
+      .footer-column ul li a {
+        color: #ccc;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .footer-column ul li a:hover {
+        color: #4fc3f7;
+      }
+
+      .social-links {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .social-links a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        color: white;
+        transition: all 0.3s;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .social-links a:hover {
+        background: #4fc3f7;
+        transform: translateY(-3px);
+      }
+
+      .copyright {
+        text-align: center;
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #999;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        .home-content h1 {
+          font-size: 2.5rem;
+        }
+
+        .steps {
+          flex-direction: column;
+          gap: 40px;
+        }
+
+        .steps::before {
+          display: none;
+        }
+
+        .step {
+          width: 100%;
+        }
+
+        nav ul {
+          display: none;
+        }
+
+        .mobile-menu-btn {
+          display: block;
+        }
+      }
+      /* Hide Google Translate top banner */
+      .goog-te-banner-frame.skiptranslate {
+        display: none !important;
+      }
+
+      /* Prevent page shift caused by banner */
+      body {
+        top: 0px !important;
+      }
+
+      /* Hide the “Powered by Google” and branding texts */
+      .goog-logo-link,
+      .goog-te-gadget span {
+        display: none !important;
+      }
+
+      /* Adjust the translate dropdown appearance */
+      #google_translate_element {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      /* Hide the tooltip popup */
+      .goog-tooltip {
+        display: none !important;
+      }
+
+      .goog-tooltip:hover {
+        display: none !important;
+      }
+
+      /* Hide the bottom Google frame */
+      .goog-te-balloon-frame {
+        display: none !important;
+      }
+
+      /* Optional: Make the dropdown blend with your navbar */
+      .goog-te-gadget {
+        color: white !important;
+        font-size: 0.9rem !important;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="home-hero">
+      <nav id="navbar">
+        <div class="logo">OSD<span>|</span> Geeks Hive</div>
+        <ul>
+          <li><div id="google_translate_element"></div></li>
+          <script type="text/javascript">
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement(
+                { pageLanguage: "en" },
+                "google_translate_element"
+              );
+            }
+          </script>
+
+          <script
+            type="text/javascript"
+            src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          ></script>
+          <li><a href="#">Home</a></li>
+          <li><a href="detection.html">Detection</a></li>
+          <li><a href="map.html">Map</a></li>
+        </ul>
+      </nav>
+
+      <div class="home-content">
+        <h1>Oil Spill Detection</h1>
+        <p>
+          Our cutting-edge ML model accurately detects oil spills in the
+          environment using satellite imagery.
+        </p>
+        <p>
+          We track the number of oil spills in specific areas and provide
+          comprehensive information about each incident.
+        </p>
+        <a href="detection.html" class="btn">Try Detection</a>
+        <a href="#" class="btn btn-outline">View Map</a>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="section-title">
+        <h2>Key Features</h2>
+        <p>
+          Our solution offers comprehensive oil spill monitoring and analysis
+          capabilities
+        </p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-satellite-dish"></i>
+          </div>
+          <h3>Satellite Monitoring</h3>
+          <p>
+            Real-time monitoring of water bodies using satellite imagery to
+            detect potential oil spills quickly.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h3>AI-Powered Detection</h3>
+          <p>
+            Advanced machine learning algorithms accurately identify oil spills
+            with high precision.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <h3>Interactive Mapping</h3>
+          <p>
+            Visualize spill locations, affected areas, and historical data on
+            our interactive map.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <div class="section-title">
+        <h2>How It Works</h2>
+        <p>Our three-step process for detecting and tracking oil spills</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Data Collection</h3>
+          <p>
+            We gather satellite imagery and sensor data from multiple sources
+            for comprehensive coverage.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>AI Analysis</h3>
+          <p>
+            Our ML model processes the data to identify potential oil spills
+            with high accuracy.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Reporting & Tracking</h3>
+          <p>
+            Detected spills are logged, mapped, and tracked with detailed
+            information for authorities.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <h2>Ready to Protect Our Oceans?</h2>
+      <p>
+        Join us in our mission to detect and prevent environmental damage from
+        oil spills.
+      </p>
+      <a href="detection.html" class="btn">Get Started</a>
+    </section>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>OSD | Geeks Hive</h3>
+          <p>
+            Advanced oil spill detection using cutting-edge machine learning
+            technology to protect our environment.
+          </p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Detection</a></li>
+            <li><a href="#">Map</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Services</h3>
+          <ul>
+            <li><a href="#">Spill Detection</a></li>
+            <li><a href="#">Area Monitoring</a></li>
+            <li><a href="#">Historical Data</a></li>
+            <li><a href="#">Alert System</a></li>
+            <li><a href="#">API Access</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 OSD | Geeks Hive. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      window.addEventListener("scroll", function () {
+        const navbar = document.getElementById("navbar");
+        if (window.scrollY > 50) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
+        }
+      });
+    </script>
+  </body>
+</html>

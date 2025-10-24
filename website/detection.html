@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ocean Oil Spill Detection</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1a2980, #26d0ce);
+        color: #fff;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        padding: 30px 0;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+
+      .main-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        margin-top: 20px;
+      }
+
+      .upload-section {
+        flex: 1;
+        min-width: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .result-section {
+        flex: 1;
+        min-width: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .drop-area {
+        border: 2px dashed rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .drop-area:hover,
+      .drop-area.active {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #4fc3f7;
+      }
+
+      .drop-area i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #4fc3f7;
+      }
+
+      .drop-area p {
+        margin-bottom: 15px;
+      }
+
+      .browse-btn {
+        background: #4fc3f7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+
+      .browse-btn:hover {
+        background: #29b6f6;
+      }
+
+      #fileInput {
+        display: none;
+      }
+
+      .image-preview {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .image-preview img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .detection-result {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+
+      .result-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+      }
+
+      .safe {
+        color: #4caf50;
+      }
+
+      .oil-spill {
+        color: #f44336;
+      }
+
+      .result-text {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .confidence {
+        font-size: 1rem;
+        opacity: 0.8;
+      }
+
+      .analyze-btn {
+        background: #4fc3f7;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        font-weight: bold;
+        width: 100%;
+        margin-top: 20px;
+        transition: background 0.3s;
+      }
+
+      .analyze-btn:hover {
+        background: #29b6f6;
+      }
+
+      .analyze-btn:disabled {
+        background: #78909c;
+        cursor: not-allowed;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .spinner {
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 5px solid #4fc3f7;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .sample-images {
+        margin-top: 30px;
+      }
+
+      .sample-title {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+      }
+
+      .sample-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+      }
+
+      .sample-img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s;
+      }
+
+      .sample-img:hover {
+        transform: scale(1.05);
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 40px;
+        padding: 20px;
+        font-size: 0.9rem;
+        opacity: 0.7;
+      }
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 5%;
+        padding-left: 10px;
+        position: fixed;
+        width: 90%;
+        top: 0;
+        z-index: 100;
+        transition: background-color 0.3s ease;
+      }
+
+      nav.scrolled {
+        background-color: rgba(0, 30, 60, 0.95);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+      }
+
+      nav ul li {
+        margin-left: 30px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.3s;
+        position: relative;
+      }
+
+      nav ul li:hover {
+        color: #4fc3f7;
+      }
+
+      nav ul li::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #4fc3f7;
+        transition: width 0.3s;
+      }
+
+      nav ul li:hover::after {
+        width: 100%;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          flex-direction: column;
+        }
+        nav ul {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <nav id="navbar">
+          <div class="logo">OSD<span>|</span> Geeks Hive</div>
+          <ul>
+            <li><div id="google_translate_element"></div></li>
+            <script type="text/javascript">
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement(
+                  { pageLanguage: "en" },
+                  "google_translate_element"
+                );
+              }
+            </script>
+
+            <script
+              type="text/javascript"
+              src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+            ></script>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="detection.html">Detection</a></li>
+            <li><a href="map.html">Map</a></li>
+          </ul>
+        </nav>
+        <h1>Ocean Oil Spill Detection</h1>
+        <p class="subtitle">
+          Upload ocean images to detect potential oil spills
+        </p>
+      </header>
+
+      <div class="main-content">
+        <div class="upload-section">
+          <h2 class="section-title">Upload Image</h2>
+
+          <div class="drop-area" id="dropArea">
+            <i>📁</i>
+            <p>Drag & Drop your ocean image here</p>
+            <p>or</p>
+            <button class="browse-btn" id="browseBtn">Browse Files</button>
+            <input type="file" id="fileInput" accept="image/*" />
+          </div>
+
+          <div class="image-preview" id="imagePreview"></div>
+
+          <button class="analyze-btn" id="analyzeBtn" disabled>
+            Analyze for Oil Spill
+          </button>
+
+          <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Analyzing image for oil spills...</p>
+          </div>
+
+          <div class="sample-images">
+            <h3 class="sample-title">Try with sample images:</h3>
+            <div class="sample-grid">
+              <img
+                src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+                class="sample-img"
+                alt="Sample ocean image 1"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+                class="sample-img"
+                alt="Sample ocean image 2"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+                class="sample-img"
+                alt="Sample ocean image 3"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+                class="sample-img"
+                alt="Sample ocean image 4"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="result-section">
+          <h2 class="section-title">Detection Result</h2>
+
+          <div class="detection-result" id="detectionResult">
+            <div class="result-icon">🌊</div>
+            <p class="result-text">Upload an image to check for oil spills</p>
+            <p class="confidence">Detection confidence: --%</p>
+          </div>
+
+          <div class="result-details">
+            <h3>About Oil Spill Detection</h3>
+            <p>
+              Oil spills in oceans can have devastating effects on marine
+              ecosystems. Our detection system analyzes satellite and aerial
+              imagery to identify potential oil spills based on visual patterns
+              and spectral signatures.
+            </p>
+
+            <h3>How it works</h3>
+            <ul>
+              <li>Upload an ocean image or use one of our samples</li>
+              <li>Our AI analyzes the image for oil spill patterns</li>
+              <li>Get immediate results with confidence percentage</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>
+          Ocean Oil Spill Detection System &copy; 2023 | For demonstration
+          purposes
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const dropArea = document.getElementById("dropArea");
+        const fileInput = document.getElementById("fileInput");
+        const browseBtn = document.getElementById("browseBtn");
+        const imagePreview = document.getElementById("imagePreview");
+        const analyzeBtn = document.getElementById("analyzeBtn");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+        const detectionResult = document.getElementById("detectionResult");
+        const sampleImages = document.querySelectorAll(".sample-img");
+
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, preventDefaults, false);
+          document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        dropArea.addEventListener("drop", handleDrop, false);
+
+        browseBtn.addEventListener("click", () => {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", function () {
+          handleFiles(this.files);
+        });
+
+        analyzeBtn.addEventListener("click", analyzeImage);
+
+        sampleImages.forEach((img) => {
+          img.addEventListener("click", function () {
+            const imgUrl = this.src;
+
+            const fakeFile = {
+              name: "sample-image.jpg",
+              type: "image/jpeg",
+              url: imgUrl,
+            };
+
+            displayImage(fakeFile);
+          });
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        function highlight() {
+          dropArea.classList.add("active");
+        }
+
+        function unhighlight() {
+          dropArea.classList.remove("active");
+        }
+
+        function handleDrop(e) {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          handleFiles(files);
+        }
+
+        function handleFiles(files) {
+          if (files.length > 0) {
+            const file = files[0];
+            if (file.type.match("image.*")) {
+              displayImage(file);
+            } else {
+              alert("Please upload an image file.");
+            }
+          }
+        }
+
+        function displayImage(file) {
+          imagePreview.innerHTML = "";
+
+          const img = document.createElement("img");
+
+          if (file instanceof File) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+              img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+          } else {
+            img.src = file.url;
+          }
+
+          imagePreview.appendChild(img);
+          analyzeBtn.disabled = false;
+
+          detectionResult.innerHTML = `
+                    <div class="result-icon">🌊</div>
+                    <p class="result-text">Ready to analyze</p>
+                    <p class="confidence">Click "Analyze for Oil Spill" to check</p>
+                `;
+        }
+      });
+    </script>
+  </body>
+</html>
